@@ -3,17 +3,17 @@ from utils import *
 import os
 
 # Read configuration file
-path = "sample_inputs"
-file = "sample1.txt"
-with open(os.path.join(path, file)) as f:
+directory = "sample_inputs"
+file_name = "sample2.txt"
+with open(os.path.join(directory, file_name)) as f:
     input = f.read()
 
-# Extract alphabet and productions from text 
+# Extract alphabet and productions from the text
 parser = Parser(input)
 alphabet = parser.get_alphabet()
 productions = parser.get_productions()
-for p in productions:
-    print(p)
+for production in productions:
+    print(production)
 
 # Define both dependency and independency relations
 relation = Relation(productions, alphabet)
@@ -30,7 +30,9 @@ print(graph)
 # To run this part installation of graphviz module is required
 # `pip install graphviz`
 
-# import graphviz
-# filename = file.split(".")[0]
-# viz = graphviz.Source(str(graph), filename="graph", format="png")
-# viz.view()
+# %%
+import graphviz
+png_filename = file_name.split(".")[0]
+viz = graphviz.Source(str(graph), filename=png_filename, format="png")
+viz.view()
+
