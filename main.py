@@ -21,3 +21,7 @@ print(relation.get_independencies_str())
 graph = Graph(relation, word)
 print(graph.FNF())
 print(graph)
+
+# import graphviz
+# viz = graphviz.Source(str(graph), filename="graph", format="png")
+# viz.view()

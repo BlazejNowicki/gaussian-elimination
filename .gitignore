@@ -1,4 +1,10 @@
 # Byte-compiled / optimized / DLL files
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.pdf
+
 __pycache__/
 *.py[cod]
 *$py.class
