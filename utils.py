@@ -42,7 +42,7 @@ class FNF:
     classes: List[List[str]]
 
     def __str__(self) -> str:
-        return "FNF([w]) = " + "".join(["(" + "".join(c) + ")" for c in self.classes])
+        return "FNF([w]) = " + "".join(["(" + ",".join(c) + ")" for c in self.classes])
 
 
 class Relation:
@@ -89,7 +89,7 @@ class Relation:
 
 class Graph:
     """Dependency graph calculated from dependency relation for a given word"""
-    def __init__(self, relation: Relation, word: str) -> None:
+    def __init__(self, relation: Relation, word: List[str]) -> None:
         self.word = word
         self.relation = relation
 
