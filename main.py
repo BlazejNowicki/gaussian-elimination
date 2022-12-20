@@ -1,88 +1,109 @@
 # %%
+from my_parser import Parser
+from scheduler import Scheduler
 from utils import *
-from dataclasses import dataclass
-import os
+import numpy as np
 
-M = lambda k, i: f'M{k},{i}'
-m = lambda k, i: f'm{k},{i}'
-n = lambda k, i, j: f'n{i},{j},{k}'
+# TODO restructure
+# TODO report
+# TODO parser dump
 
-@dataclass
-class A:
-    i: int
-    k: int
 
-    def __str__(self):
-        return f'A{self.i}{self.k}'
+# Variable definitions
+M = lambda k, i: f"M{k},{i}"
+m = lambda k, i: f"m{k},{i}"
+n = lambda k, i, j: f"n{i},{j},{k}"
 
-    def to_production(self):
-        i,k = self.i, self.k
-        return Production(str(self), [M(k,i), M(i,i)], [m(k,i)])
 
-@dataclass
-class B:
-    i: int
-    j: int
-    k: int
+class A(Task):
+    def __init__(self, i: int, k: int) -> None:
+        super().__init__(f"A{i}{k}", [M(k, i), M(i, i)], [m(k, i)])
+        self.ik = (i, k)
 
-    def __str__(self):
-        return f'B{self.i}{self.j}{self.k}'
+    def run(self, *args, **kwargs):
+        M: np.ndarray = kwargs["M"]
+        m: np.ndarray = kwargs["m"]
+        i, k = self.ik
 
-    def to_production(self):
-        i,j,k = self.i, self.j, self.k
-        return Production(str(self), [M(i, j), m(k,i)], [n(k,i, j)])
+        m[k - 1, i - 1] = M[k - 1, i - 1] / M[i - 1, i - 1]
 
-@dataclass
-class C:
-    i: int
-    j: int
-    k: int
 
-    def __str__(self):
-        return f'C{self.i}{self.j}{self.k}'
+class B(Task):
+    def __init__(self, i, j, k) -> None:
+        super().__init__(f"B{i}{j}{k}", [M(i, j), m(k, i)], [n(k, i, j)])
+        self.ijk = (i, j, k)
 
-    def to_production(self):
-        i,j,k = self.i, self.j, self.k
-        return Production(str(self), [M(k, j), n(k,i, j)], [M(k,j)])
-    
+    def run(self, *args, **kwargs):
+        M: np.ndarray = kwargs["M"]
+        m: np.ndarray = kwargs["m"]
+        n: np.ndarray = kwargs["n"]
+        i, j, k = self.ijk
+
+        n[k-1, i-1, j-1] = M[i-1, j-1] * m[k-1, i-1]
+
+
+class C(Task):
+    def __init__(self, i, j, k) -> None:
+        super().__init__(f"C{i}{j}{k}", [M(k, j), n(k, i, j)], [M(k, j)])
+        self.ijk = (i, j, k)
+
+    def run(self, *args, **kwargs):
+        M: np.ndarray = kwargs["M"]
+        n: np.ndarray = kwargs["n"]
+        i, j, k = self.ijk
+
+        M[k-1, j-1] = M[k-1,j-1] - n[k-1, i-1, j-1]
+        print(M, end='\n\n')
+
+# %%
 
 alphabet = []
 productions = []
 word = []
 
+
 def add(x):
-    alphabet.append(str(x))
-    productions.append(x.to_production())
-    word.append(str(x))
+    alphabet.append(x)
+    productions.append(x)
+    word.append(x)
 
-s = 3
-for i in range(1,s):
-    for k in range(i+1, s+1):
-        add(A(i,k))
-        for j in range(i, s+2):
-            add(B(i,j,k))
-            add(C(i,j,k))
 
-# print(alphabet)
-# print(productions)
+size = 3
+for i in range(1, size):
+    for k in range(i + 1, size + 1):
+        add(A(i, k))
+        for j in range(i, size + 2):
+            add(B(i, j, k))
+            add(C(i, j, k))
 
-# Define both dependency and independency relations
 relation = Relation(productions, alphabet)
-print(relation.get_dependencies_str())
-# print(relation.get_independencies_str())
 
 # Create graph for given word and calculate Foata Normal Form
-# word = parser.get_word()
 graph = Graph(relation, word)
-print(graph.FNF())
-print(graph)
+fnf = graph.to_FNF()
+print(fnf)
 
-# Draw dependency graph from dot format and save it as png file
-# To run this part installation of graphviz module is required
-# `pip install graphviz`
 
-# %%
+# %% 
+
+M = Parser("in.txt").load()
+n = np.zeros((M.shape[0], M.shape[1], M.shape[1]))
+m = np.zeros_like(M)
+
+print(M)
+
+Scheduler(fnf).run(M=M, n=n, m=m)
+
+for i in range(M.shape[0]):
+    M[i, :] = M[i, :] / M[i, i]
+
+for i in range(M.shape[0]-1, 0, -1):
+    for j in range(i):
+        M[j, :] = M[j, :] - M[i, :] * (M[j, i] / M[i, i])
+
+print(M)
+
+# %% 
 import graphviz
 viz = graphviz.Source(str(graph), filename="graph", format="png")
 viz.view()
-

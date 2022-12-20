@@ -4,7 +4,7 @@
 *.fls
 *.synctex.gz
 *.pdf
-
+in.txt
 __pycache__
 *.py[cod]
 *$py.class

@@ -1,0 +1,83 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings, newtxtt}
+
+
+\graphicspath{{images/}}
+\lstset{basicstyle=\ttfamily, keywordstyle=\bfseries}
+
+\title{Teoria Współbieżności - lab 5 \\ Eliminacja Gaussa}
+\author{Błażej Nowicki}
+\date{\today}
+\begin{document}
+\maketitle
+\section{Wstęp teoretyczny}
+\subsection{Niepodzielne zadania obliczeniowe}
+
+Metoda eliminacji Gaussa jest to algorytm wykorzystywany do m. in.
+rozwiązywania układów liniowych. Głównym krokiem jest sprowadzenie macierzy do postaci schodkowej
+górnej. Można to osiągnąć odejmując wielokrotności kolejnych wierszy macierzy od wierszy poniżej
+aż pod przekątną zostaną same zer.
+Mamy daną przykładową macierz z wektorem wyrazów wolnych:
+
+$$
+	\begin{bmatrix}
+		M_{1,1} & M_{1,2} & M_{1,3} \\
+		M_{2,1} & M_{2,2} & M_{2,3} \\
+		M_{3,1} & M_{3,2} & M_{3,3} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+		 M_{1,4} \\
+		 M_{2,4} \\
+		 M_{3,4} \\
+	\end{bmatrix}
+$$
+
+Można wyróżnić trzy powtarzające się typy operacji:
+\begin{itemize}
+    \item $ A_{i, k} $ - wykonie dzielenia $ M_{k,i} / M_{i,i} $ aby uzyskać współczynnik $ m_{k,i} $ 
+    \item $ B_{i,j,k} $ - mnożenie wyrazów $ M_{i,j} $ i $ m_{k,i} $, w celu uzyskania różnicy $ n_{k,j,i} $
+    \item $ C_{i, j, k} $ - odejmownie $ n_{k,i} $ od $ M_{k,j} $
+\end{itemize}
+
+\subsection{Ciąg operacji}
+
+Analizując jakie kroki należy wykonać można zauważyć powtarzający się schemat.
+Dla każdego  wiersza najpierw wyznaczamy współczynnik - operacja $A$, a następnie 
+na zmianę  $B$ i $C$ dla każdej kolumny. Efektywnie odejmujemy jeden wiersz od drugiego z wyznaczonym współczynnikiem. \\
+Można tą operację oznaczyć jako $p_{i,k}$, gdzie: \\
+$ p_{i,k} $ - odjęcie i-tego wiersza od k-tego ze współczynnikiem $M_{k,i}/M_{i,i}$ \\
+$ p_{i,k} = ( A_{i,k}, B_{i,i,k}, C_{i,i,k}, B_{i,i+1,k}, C_{i,i+1,k},\ldots,B_{i, s+1, k}, C_{i,s+1,k}) $ \\
+$s$ - rozmiar macierzy \\
+Wtedy ciąg wszystkich operacji można zapisać jako: \\
+$ (p_{1,2}, p_{1,3}, \ldots, p_{1,s},\\
+p_{2,3}, p_{2,3}, \ldots, p_{2, s},\\
+\ldots\\
+p_{s-2, s-1}, p_{s-2, s} \\
+p_{s-1, s}
+) $
+
+\subsection{Alfabet}
+
+$ \Sigma = \{ A_{i,k} | i \subseteq \{1, \ldots, s-1\}, k \subseteq \{ i+1, \ldots, s \}\} \cup \\
+\{ B_{i,j,k} | i \subseteq \{1, \ldots, s-1\}, k \subseteq \{ i+1, \ldots, s \}, j \subseteq \{ i, \ldots, s+1 \} \cup \\
+\{ C{i,j,k} | i \subseteq \{1, \ldots, s-1\}, k \subseteq \{ i+1, \ldots, s \}, j \subseteq \{ i, \ldots, s+1 \}\}$
+
+\subsection{Relacja zależności}
+
+$D_1 = \{ (A_{i,k}, B_{i, j, k}) | i \subseteq \{ 1, \ldots, s-1 \},j \subseteq \{ i, \ldots, s+1 \}, k \subseteq \{i+1, \ldots, s-1 \}\}$ \\
+$D_2 = \{ (B_{i,j,k}, C_{i,j,k}) | i \subseteq \{ 1, \ldots, s-1 \},j \subseteq \{ i, \ldots, s+1 \}, k \subseteq \{i+1, \ldots, s-1 \}\}$ \\
+$D_3 = \{ (C_{i,j,k}, A_{i,j,k}) | \}$ \\
+
+
+\subsection{Graf zależności Diekerta}
+\subsection{Klasy Foaty}
+
+\section{Implementacja}
+\end{document}
