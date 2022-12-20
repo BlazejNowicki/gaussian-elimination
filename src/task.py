@@ -41,5 +41,5 @@ class Task(ABC):
     def __lt__(self, other: object):
         if isinstance(other, Task):
             return self._name < other._name
-        return TypeError(f"Incomparable types: Task and {type(other)}")
+        raise TypeError(f"Incomparable types: Task and {type(other)}")
 

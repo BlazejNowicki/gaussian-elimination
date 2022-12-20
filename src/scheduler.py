@@ -1,6 +1,6 @@
-from utils import FNF
 from typing import Any, List
 from threading import Thread
+from src.fnf import FNF
 
 
 class Scheduler:

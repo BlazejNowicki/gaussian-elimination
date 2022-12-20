@@ -1,13 +1,11 @@
 # %%
-from my_parser import Parser
-from scheduler import Scheduler
-from utils import *
 import numpy as np
 
-# TODO restructure
-# TODO report
-# TODO parser dump
-
+from src.parser import Parser
+from src.scheduler import Scheduler
+from src.graph import Graph
+from src.task import Task
+from src.relation import Relation
 
 # Variable definitions
 M = lambda k, i: f"M{k},{i}"
@@ -39,7 +37,7 @@ class B(Task):
         n: np.ndarray = kwargs["n"]
         i, j, k = self.ijk
 
-        n[k-1, i-1, j-1] = M[i-1, j-1] * m[k-1, i-1]
+        n[k - 1, i - 1, j - 1] = M[i - 1, j - 1] * m[k - 1, i - 1]
 
 
 class C(Task):
@@ -52,8 +50,8 @@ class C(Task):
         n: np.ndarray = kwargs["n"]
         i, j, k = self.ijk
 
-        M[k-1, j-1] = M[k-1,j-1] - n[k-1, i-1, j-1]
-        print(M, end='\n\n')
+        M[k - 1, j - 1] = M[k - 1, j - 1] - n[k - 1, i - 1, j - 1]
+
 
 # %%
 
@@ -84,9 +82,9 @@ fnf = graph.to_FNF()
 print(fnf)
 
 
-# %% 
-
-M = Parser("in.txt").load()
+# %%
+parser = Parser("examples/in.txt", "examples/out.txt")
+M = parser.load()
 n = np.zeros((M.shape[0], M.shape[1], M.shape[1]))
 m = np.zeros_like(M)
 
@@ -94,16 +92,20 @@ print(M)
 
 Scheduler(fnf).run(M=M, n=n, m=m)
 
+print(M)
+
 for i in range(M.shape[0]):
     M[i, :] = M[i, :] / M[i, i]
 
-for i in range(M.shape[0]-1, 0, -1):
+for i in range(M.shape[0] - 1, 0, -1):
     for j in range(i):
         M[j, :] = M[j, :] - M[i, :] * (M[j, i] / M[i, i])
 
 print(M)
+parser.dump(M)
 
-# %% 
-import graphviz
-viz = graphviz.Source(str(graph), filename="graph", format="png")
-viz.view()
+# %%
+
+# import graphviz
+# viz = graphviz.Source(str(graph), filename="graph", format="png")
+# viz.view()

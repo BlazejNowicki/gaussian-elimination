@@ -1,66 +1,7 @@
 from typing import List
-from dataclasses import dataclass
-import re
-from task import Task
-
-
-@dataclass
-class FNF:
-    """
-    Class that represents Foata Normal Form.
-
-    classes - list of classes that compose Foata Normal Form
-    """
-
-    classes: List[List[Task]]
-
-    def __str__(self) -> str:
-        return "FNF([w]) = " + "".join(
-            ["(" + ",".join(map(str, c)) + ")" for c in self.classes]
-        )
-
-
-class Relation:
-    """
-    Class that defines relations of dependency and independency given productions and the alphabet.
-    """
-
-    def __init__(self, productions: List[Task], alphabet: List[Task]) -> None:
-        # pairs of symbols from the alphabet that define relations
-        self.D = set()
-        self.I = set()
-
-        # determine dependency relation from definition
-        # for every combination of productions check if any output from
-        # the first production is used as an input or output in the second production
-        for x in productions:
-            for y in productions:
-                if any(symbol in y.all for symbol in x.outputs) or any(
-                    symbol in x.all for symbol in y.outputs
-                ):
-                    self.D.add((x, y))
-                else:
-                    self.I.add((x, y))
-
-        # if any symbol is in the alphabet but is not used in productions
-        # it is still dependent on itself
-        for symbol in alphabet:
-            self.D.add((symbol, symbol))
-            # TODO add independencies
-
-    def dependent(self, a: Task, b: Task):
-        """Check if two symbols are in the dependency relation"""
-        return (a, b) in self.D
-
-    def to_dependency_str(self):
-        """Return string representation of dependency relation"""
-        d = [f"({a},{b})" for a, b in sorted(list(self.D))]
-        return "D = {" + ",".join(d) + "}"
-
-    def to_independency_str(self):
-        """Return string representation of independency relation"""
-        i = [f"({a},{b})" for a, b in sorted(list(self.I))]
-        return "I = {" + ",".join(i) + "}"
+from src.task import Task
+from src.relation import Relation
+from src.fnf import FNF
 
 
 class Graph:
