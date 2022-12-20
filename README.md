@@ -1,2 +1,2 @@
-## Trace theory applied for concurrently solving system of linear equations
+## Concurrently solving system of linear equations with Trace Theory
 
